@@ -13,7 +13,7 @@ def transform_covid_numbers():
         "AnzEinwohner": "population", 
         "Anzahl": "cases",
         "AnzahlGeheilt": "recovered",
-        "AnzahlTot": "dead"
+        "AnzahlTot": "deceased"
         }, inplace=True)
     numbers.sort_values(by=["date"], inplace=True)
     numbers.to_csv("covid_numbers_per_state.csv", index=False)
@@ -32,5 +32,6 @@ def transform_hospital_numbers():
     hospitals.sort_values(by=["date"], inplace=True)
     hospitals.to_csv("hospital_numbers_per_state.csv", index=False)
 
-# TODO: remove states with population < 1,000,000 !(Niederösterreich, Steiermark, Oberösterreich, Wien)
+# TODO: remove states with population < 1,000,000 !(Niederösterreich, Steiermark, Oberösterreich, Wien), merge covid and hospital numbers,
+# merge
 transform_hospital_numbers()
