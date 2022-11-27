@@ -18,6 +18,20 @@ def transform():
         "cases.recovered.todate": "recovered"
     }, inplace=True)
 
+    stats["normal_beds"] = stats["normal_beds"] - stats["ICU_beds"]
     stats["date"] = pd.to_datetime(stats["date"], format="%Y-%m-%d")
+    stats.sort_values(by=["date"], inplace=True)
+    stats["deceased"] = stats["deceased"].diff()
+    stats["recovered"] = stats["recovered"].diff()
 
     return stats
+
+def merge_weather():
+    stats = pd.read_csv("covid_data_slovenia.csv")
+    weather = pd.read_csv("weather/weather_slovenia.csv")
+    weather.rename(columns={
+        "avg": "temp_avg",
+        "min": "temp_min",
+        "max": "temp_min"
+        }, inplace=True)
+    return pd.merge(stats, weather, on=["date"], how="left")

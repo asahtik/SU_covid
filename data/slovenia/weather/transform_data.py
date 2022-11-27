@@ -64,8 +64,9 @@ def get_avg(weather: pd.DataFrame):
     max_mask = weather.columns.str.contains("^.*_max$")
     weather.drop(weather.columns[max_mask], axis=1, inplace=True)
 
+    weather.sort_values(by=["date"], inplace=True)
+
     return weather
 
-
-# import pandas as pd
-# from process_weather import get_c_weather_data
+def transform():
+    return get_avg(get_c_weather_data())

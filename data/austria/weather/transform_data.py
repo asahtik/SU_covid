@@ -30,14 +30,12 @@ def to_daily(data):
     data["temperature"] = data[["T5cm", "T2m"]].mean(axis=1)
     data.drop(["T5cm", "T2m"], axis=1, inplace=True)
     grouped = data.groupby(["date", "station", "state"]).\
-        agg(Mean=("temperature", "mean"), Min=("temperature", "min"), Max=("temperature", "max")).reset_index()
+        agg(avg=("temperature", "mean"), min=("temperature", "min"), max=("temperature", "max")).reset_index()
     grouped.drop("station", axis=1, inplace=True)
     grouped = grouped.groupby(["date", "state"]).mean().reset_index()
-
-    grouped.rename(columns={
-        "Mean": "avg",
-        "Min": "min",
-        "Max": "max"
-    }, inplace=True)
+    grouped.sort_values(by=["date", "state"], inplace=True)
 
     return grouped
+
+def transform():
+    return to_daily(merge_station_data())

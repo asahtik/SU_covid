@@ -2,6 +2,8 @@
 
 import pandas as pd
 
+states = ["Niederösterreich", "Steiermark", "Oberösterreich", "Wien"]
+
 def transform_covid_numbers():
     numbers = pd.read_csv("CovidFaelle_Altersgruppe.csv", delimiter=";")
     numbers.drop(["AltersgruppeID", "Altersgruppe", "BundeslandID", "Geschlecht"], axis=1, inplace=True)
@@ -16,7 +18,7 @@ def transform_covid_numbers():
         "AnzahlTot": "deceased"
         }, inplace=True)
     numbers.sort_values(by=["date"], inplace=True)
-    numbers.to_csv("covid_numbers_per_state.csv", index=False)
+    return numbers
 
 def transform_hospital_numbers():
     hospitals = pd.read_csv("CovidFallzahlen.csv", delimiter=";")
@@ -30,8 +32,23 @@ def transform_hospital_numbers():
         "Bundesland": "state"
         }, inplace=True)
     hospitals.sort_values(by=["date"], inplace=True)
-    hospitals.to_csv("hospital_numbers_per_state.csv", index=False)
+    return hospitals
 
-# TODO: remove states with population < 1,000,000 !(Niederösterreich, Steiermark, Oberösterreich, Wien), merge covid and hospital numbers,
-# merge
-transform_hospital_numbers()
+def transform():
+    covid = transform_covid_numbers()
+    hospitals = transform_hospital_numbers()
+    covid = covid[covid["state"].isin(states)]
+    hospitals = hospitals[hospitals["state"].isin(states)]
+    merged = pd.merge(covid, hospitals, on=["date", "state"], how="outer")
+    merged.sort_values(by=["date", "state"], inplace=True)
+    return merged
+
+def merge_weather():
+    stats = pd.read_csv("covid_data_austria.csv")
+    weather = pd.read_csv("weather/weather_austria.csv")
+    weather.rename(columns={
+        "avg": "temp_avg",
+        "min": "temp_min",
+        "max": "temp_min"
+        }, inplace=True)
+    return pd.merge(stats, weather, on=["date", "state"], how="left")
