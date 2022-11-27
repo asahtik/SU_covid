@@ -35,3 +35,11 @@ def merge_weather():
         "max": "temp_min"
         }, inplace=True)
     return pd.merge(stats, weather, on=["date"], how="left")
+
+def add_features():
+    start_date = pd.Timestamp("2020-03-05") # Day after patient zero
+    data = pd.read_csv("covid_data_slovenia.csv")
+    data["date"] = pd.to_datetime(data["date"], format="%Y-%m-%d")
+    data["day"] = (data["date"] - start_date).dt.days
+    data["dow"] = data["date"].dt.day_name("en_US.utf8")
+    return data
