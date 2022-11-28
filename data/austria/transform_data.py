@@ -49,7 +49,7 @@ def merge_weather():
     weather.rename(columns={
         "avg": "temp_avg",
         "min": "temp_min",
-        "max": "temp_min"
+        "max": "temp_max"
         }, inplace=True)
     return pd.merge(stats, weather, on=["date", "state"], how="left")
 
