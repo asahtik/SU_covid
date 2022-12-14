@@ -49,14 +49,43 @@ def merge_weather():
     weather.rename(columns={
         "avg": "temp_avg",
         "min": "temp_min",
-        "max": "temp_min"
+        "max": "temp_max"
         }, inplace=True)
     return pd.merge(stats, weather, on=["date", "state"], how="left")
 
 def add_features():
+    holidays = [
+        (1, 1),
+        (6, 1),
+        (1, 5),
+        (26, 5),
+        (6, 6),
+        (15, 8),
+        (26, 10),
+        (1, 11),
+        (8, 12),
+        (24, 12),
+        (25, 12),
+        (26, 12),
+        (31, 12)
+    ]
+    easters = [pd.Timestamp("2020-04-12"), pd.Timestamp("2021-04-04"), pd.Timestamp("2022-04-17")]
+
     start_date = pd.Timestamp("2020-02-25") # Day after patient zero
     data = pd.read_csv("covid_data_austria.csv")
     data["date"] = pd.to_datetime(data["date"], format="%Y-%m-%d")
     data["day"] = (data["date"] - start_date).dt.days
     data["dow"] = data["date"].dt.day_name("en_US.utf8")
+    data["holiday"] = data["date"].apply(lambda x: (x.day, x.month) in holidays or x in easters)
+
+    q1 = pd.Timestamp("2020-03-16")
+    q2 = pd.Timestamp("2020-04-21")
+    q3 = pd.Timestamp("2020-11-17")
+    q4 = pd.Timestamp("2020-12-07")
+    q5 = pd.Timestamp("2020-12-26")
+    q6 = pd.Timestamp("2021-02-08")
+    q7 = pd.Timestamp("2021-11-22")
+    q8 = pd.Timestamp("2021-12-13")
+    data["lockdown"] = q1 <= data["date"] and data["date"] < q2 or q3 <= data["date"] and data["date"] < q4 or \
+        q5 <= data["date"] and data["date"] < q6 or q7 <= data["date"] and data["date"] < q8
     return data
