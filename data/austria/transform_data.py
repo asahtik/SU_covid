@@ -18,6 +18,10 @@ def transform_covid_numbers():
         "AnzahlTot": "deceased"
         }, inplace=True)
     numbers.sort_values(by=["date"], inplace=True)
+    grouped = numbers.groupby("state")
+    numbers["cases"] = grouped["cases"].diff()
+    numbers["deceased"] = grouped["deceased"].diff()
+    numbers["recovered"] = grouped["recovered"].diff()
     return numbers
 
 def transform_hospital_numbers():
@@ -32,6 +36,8 @@ def transform_hospital_numbers():
         "Bundesland": "state"
         }, inplace=True)
     hospitals.sort_values(by=["date"], inplace=True)
+    grouped = hospitals.groupby("state")
+    hospitals["tests"] = grouped["tests"].diff()
     return hospitals
 
 def add_features(data):
